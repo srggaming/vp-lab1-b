@@ -38,6 +38,8 @@ src/
 ├── main/
 │   ├── java/mk/ukim/finki/wp/lab/
 │   │   ├── LabApplication.java          # Главна Spring Boot класа
+│   │   ├── config/                      # Конфигурација
+│   │   │   └── ThymeleafConfig.java     # Thymeleaf конфигурација
 │   │   ├── model/                       # Model слој
 │   │   │   ├── Chef.java                # Готвач (id, firstName, lastName, bio, dishes)
 │   │   │   └── Dish.java                # Јадење (dishId, name, cuisine, preparationTime)
@@ -59,7 +61,12 @@ src/
 │   │       ├── DishServlet.java         # Приказ на листа на јадења
 │   │       └── ChefDetailsServlet.java  # Приказ на детали за готвач
 │   └── resources/
+│       ├── templates/                   # Thymeleaf HTML template фајлови
+│       │   ├── listChefs.html           # Template за листа на готвачи
+│       │   ├── dishesList.html          # Template за листа на јадења
+│       │   └── chefDetails.html         # Template за детали за готвач
 │       └── application.properties       # Конфигурација на апликацијата
+├── TEST_INSTRUCTIONS.md                 # Детални инструкции за тестирање
 └── pom.xml                              # Maven конфигурација
 ```
 
@@ -69,6 +76,7 @@ src/
 - **Spring Boot 3.1.5** - Framework за апликацијата
 - **Maven** - Build tool и dependency management
 - **Jakarta Servlets** - Web слој (наместо Spring MVC)
+- **Thymeleaf** - Template engine за динамичко генерирање на HTML
 - **Lombok** - За автоматско генерирање на getters/setters/constructors
 
 ## Flow на апликацијата
@@ -161,22 +169,53 @@ public ChefListServlet(ChefService chefService) {
 
 1. **@ServletComponentScan** анотацијата во `LabApplication` е ЗАДОЛЖИТЕЛНА за да работат сервлетите!
 
-2. **Секој сервлет има dependency injection** - Spring ги инјектира потребните service-и.
+2. **Секој сервлет има dependency injection** - Spring ги инјектира потребните service-и и SpringTemplateEngine.
 
 3. **UTF-8 encoding** е конфигуриран за поддршка на кирилични карактери.
 
-4. **PrintWriter се користи за генерирање на HTML** - во реални апликации би користеле template engine (Thymeleaf, JSP, итн.)
+4. **Thymeleaf се користи за генерирање на HTML** - сервлетите користат Thymeleaf template engine за rendering на HTML фајловите.
 
-5. **Hidden inputs** се користат за пренос на податоци меѓу формите (chefId во DishServlet).
+5. **HTML template фајлови** се наоѓаат во `src/main/resources/templates/` и користат Thymeleaf синтакса (th:each, th:text, th:value, итн.)
+
+6. **ThymeleafConfig** класа го конфигурира Thymeleaf template engine со SpringResourceTemplateResolver.
+
+7. **Hidden inputs** се користат за пренос на податоци меѓу формите (chefId во DishServlet).
+
+## Thymeleaf основни концепти
+
+### Динамичко генерирање на content
+
+```html
+<!-- th:each - loop низ листа -->
+<div th:each="chef : ${chefs}">
+    <!-- th:value - динамички поставува вредност -->
+    <input type="radio" th:value="${chef.id}">
+    <!-- th:text - динамички поставува текст -->
+    <span th:text="${chef.firstName} + ' ' + ${chef.lastName}"></span>
+</div>
+```
+
+### Условно прикажување
+
+```html
+<!-- th:if - прикажи ако условот е точен -->
+<p th:if="${chef.dishes.isEmpty()}">No dishes yet.</p>
+
+<!-- th:unless - прикажи ако условот е неточен -->
+<ul th:unless="${chef.dishes.isEmpty()}">
+    <li th:each="dish : ${chef.dishes}" th:text="${dish.name}"></li>
+</ul>
+```
 
 ## Можни подобрувања
 
-- [ ] Користење на Thymeleaf наместо PrintWriter за HTML
 - [ ] Додавање на валидација на податоци
 - [ ] Додавање на error handling
 - [ ] Користење на база на податоци наместо in-memory листи
 - [ ] Додавање на можност за бришење на јадење од готвач
 - [ ] Додавање на CSS framework (Bootstrap)
+- [ ] Додавање на unit тестови за service слојот
+- [ ] Додавање на integration тестови за сервлетите
 
 ## Автор
 

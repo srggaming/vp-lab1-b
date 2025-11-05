@@ -36,6 +36,14 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- Spring Boot Starter Thymeleaf - template engine за динамичко генерирање на HTML -->
+        <!-- Thymeleaf овозможува да креираме HTML фајлови со специјални атрибути за динамички content -->
+        <!-- Пример: <li th:each="chef : ${chefs}"> ќе креира list item за секој готвач -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
         <!-- Lombok - библиотека за автоматско генерирање на boilerplate код -->
         <!-- Генерира getters, setters, конструктори, toString, итн. -->
         <dependency>

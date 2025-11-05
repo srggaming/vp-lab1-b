@@ -11,8 +11,13 @@ import jakarta.servlet.http.HttpServletResponse; // Објект за испра
 import mk.ukim.finki.wp.lab.model.Chef; // Нашата Chef класа
 import mk.ukim.finki.wp.lab.service.ChefService; // Service за работа со готвачи
 
+// Импортираме Thymeleaf класи
+import org.thymeleaf.context.WebContext; // Контекст за Thymeleaf со web податоци
+import org.thymeleaf.spring6.SpringTemplateEngine; // Thymeleaf template engine
+import org.thymeleaf.web.IWebExchange; // Интерфејс за web размена (request/response)
+import org.thymeleaf.web.servlet.JakartaServletWebApplication; // Adapter за Jakarta Servlets
+
 import java.io.IOException; // Исклучок за I/O грешки
-import java.io.PrintWriter; // Класа за запишување на текст во response
 import java.util.List; // Интерфејс за листа
 
 /**
@@ -20,48 +25,49 @@ import java.util.List; // Интерфејс за листа
  * Сервлетот е одговорен за прикажување на листа на готвачи
  * Овој сервлет е првата страница што корисникот ја гледа
  * Корисникот избира готвач од листата
+ *
+ * Ажурирано да користи Thymeleaf template (listChefs.html) наместо PrintWriter
  */
 @WebServlet(name = "ChefListServlet", urlPatterns = "/listChefs")
 // @WebServlet - Spring Boot анотација за регистрирање на сервлет
-// name = "ChefListServlet" - името на сервлетот (користено за internal reference)
 // urlPatterns = "/listChefs" - URL патеката на која е достапен сервлетот
-// Кога корисникот оди на http://localhost:8080/listChefs, овој сервлет се активира
 public class ChefListServlet extends HttpServlet {
-    // extends HttpServlet - ја наследуваме HttpServlet класата
-    // Со тоа добиваме сè што е потребно за обработка на HTTP барања
 
     /**
      * Dependency на ChefService
      * Ни треба за да ги добиеме сите готвачи
-     * private final - immutable dependency
      */
     private final ChefService chefService;
 
     /**
+     * Dependency на SpringTemplateEngine
+     * Ни треба за да ги render-ираме Thymeleaf template фајловите
+     * Spring автоматски го инјектира bean-от што го креиравме во ThymeleafConfig
+     */
+    private final SpringTemplateEngine templateEngine;
+
+    /**
      * Конструктор со параметри
-     * Spring автоматски го повикува овој конструктор и го инјектира ChefService bean-от
-     * Ова е constructor injection - Spring го наоѓа ChefServiceImpl bean-от и го инјектира
+     * Spring автоматски ги инјектира двата bean-ови (ChefService и SpringTemplateEngine)
      *
      * @param chefService - service за готвачи (автоматски инјектиран од Spring)
+     * @param templateEngine - Thymeleaf engine (автоматски инјектиран од Spring)
      */
-    public ChefListServlet(ChefService chefService) {
-        // this.chefService - полето на класата
-        // chefService - параметарот од конструкторот
+    public ChefListServlet(ChefService chefService, SpringTemplateEngine templateEngine) {
         this.chefService = chefService;
+        this.templateEngine = templateEngine;
     }
 
     /**
      * doGet() метод
      * Се извршува кога корисникот испрати GET барање на /listChefs
-     * GET барања се користат за читање на податоци (не менуваат ништо на серверот)
-     * Пример: Кога корисникот пишува URL во browser или кликне на link
      *
      * @param req - HttpServletRequest објект што ги содржи податоците од барањето
      * @param resp - HttpServletResponse објект за испраќање на одговор до клиентот
      * @throws ServletException - се фрла ако има проблем во сервлетот
      * @throws IOException - се фрла ако има проблем со I/O операции
      */
-    @Override // Override-уваме метод од HttpServlet класата
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
@@ -71,76 +77,42 @@ public class ChefListServlet extends HttpServlet {
 
         // Чекор 2: Го поставуваме content type на одговорот
         // "text/html; charset=UTF-8" - одговорот е HTML со UTF-8 енкодинг
-        // UTF-8 е важно за кирилични карактери (македонски текст)
         resp.setContentType("text/html; charset=UTF-8");
 
-        // Чекор 3: Го добиваме PrintWriter објектот за запишување на одговор
-        // PrintWriter ни овозможува да испраќаме текст (HTML) до клиентот
-        PrintWriter out = resp.getWriter();
+        // Чекор 3: Креираме Thymeleaf WebContext
+        // WebContext го содржи контекстот за template rendering (променливи, request, response, итн.)
 
-        // Чекор 4: Пишуваме HTML код
-        // Почеток на HTML документот
-        out.println("<!DOCTYPE html>");
-        out.println("<html>");
-        out.println("<head>");
-        out.println("    <meta charset=\"utf-8\">"); // За кирилични карактери
-        out.println("    <title>Restaurant Chefs - Welcome to Our Restaurant</title>");
+        // Прво, креираме IWebExchange од request и response
+        // JakartaServletWebApplication е adapter што го претвора Jakarta Servlet API во Thymeleaf API
+        IWebExchange webExchange = JakartaServletWebApplication
+                .buildApplication(getServletContext()) // getServletContext() - го добива servlet контекстот
+                .buildExchange(req, resp); // buildExchange() - го креира web exchange од request и response
 
-        // CSS стилови за изглед
-        out.println("    <style type=\"text/css\">");
-        out.println("        body {");
-        out.println("            width: 800px;"); // Ширина на страницата
-        out.println("            margin: auto;"); // Центрирање на страницата
-        out.println("            font-family: Arial, sans-serif;"); // Фонт
-        out.println("        }");
-        out.println("        h1 {");
-        out.println("            color: #333;"); // Боја на насловот
-        out.println("        }");
-        out.println("    </style>");
-        out.println("</head>");
-        out.println("<body>");
+        // Креираме WebContext од web exchange
+        // WebContext е специјален Thymeleaf контекст за web апликации
+        // Содржи информации за request, response, session, итн.
+        WebContext context = new WebContext(webExchange);
 
-        // Header со наслов
-        out.println("    <header>");
-        out.println("        <h1>Welcome to Our Restaurant</h1>");
-        out.println("        <p>Please select a chef from the list below:</p>");
-        out.println("    </header>");
+        // Чекор 4: Ги додаваме променливите во контекстот
+        // context.setVariable(name, value) - додава променлива што може да се користи во template-от
+        // "chefs" - името на променливата (во template-от ќе биде ${chefs})
+        // chefs - листата на готвачи што ја добивме од service-от
+        context.setVariable("chefs", chefs);
 
-        // Main content
-        out.println("    <main>");
-        out.println("        <h2>Choose a chef:</h2>");
+        // Чекор 5: Го render-ираме template-от
+        // templateEngine.process() - го процесира Thymeleaf template-от
+        // Параметри:
+        // 1. "listChefs" - името на template фајлот (без .html суфикс)
+        //    Thymeleaf автоматски ќе го најде src/main/resources/templates/listChefs.html
+        // 2. context - WebContext со променливите
+        // 3. resp.getWriter() - Writer за испишување на резултатот (rendered HTML)
+        templateEngine.process("listChefs", context, resp.getWriter());
 
-        // Формата за избор на готвач
-        // action="/dish" - кога се submitува формата, се испраќа до /dish URL-то
-        // method="POST" - користиме POST метод (за разлика од GET)
-        out.println("        <form action=\"/dish\" method=\"POST\">");
-
-        // Динамичко креирање на radio buttons за секој готвач
-        // Итерираме низ листата на готвачи
-        for (Chef chef : chefs) {
-            // for (Chef chef : chefs) - enhanced for loop
-            // Chef chef - променливата што го претставува тековниот готвач
-            // : - separator
-            // chefs - листата низ која итерираме
-
-            // За секој готвач, креираме radio button
-            out.println("            <input type=\"radio\" " +
-                       "name=\"chefId\" " + // Името на полето (ќе се испрати до серверот)
-                       "value=\"" + chef.getId() + "\"> " + // Вредноста е ID-то на готвачот
-                       // Текстот што се прикажува до radio button:
-                       "Name: " + chef.getFirstName() + " " + chef.getLastName() +
-                       ", Bio: " + chef.getBio() +
-                       "<br/>"); // Line break
-        }
-
-        // Submit копче
-        out.println("            <br/>");
-        out.println("            <input type=\"submit\" value=\"Submit\">");
-        out.println("        </form>");
-        out.println("    </main>");
-        out.println("</body>");
-        out.println("</html>");
-
-        // Важно: PrintWriter автоматски се затвара, не е потребно експлицитно close()
+        // Процесот:
+        // 1. Thymeleaf го чита listChefs.html фајлот
+        // 2. Го наоѓа th:each="chef : ${chefs}" атрибутот
+        // 3. За секој chef од chefs листата, креира radio button
+        // 4. Ги заменува ${chef.id}, ${chef.firstName}, итн. со вистински вредности
+        // 5. Го испраќа финалниот HTML до клиентот преку resp.getWriter()
     }
 }

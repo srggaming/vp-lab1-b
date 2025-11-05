@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<!-- Thymeleaf template фајл за приказ на детали за готвачот -->
+<!-- xmlns:th="http://www.thymeleaf.org" - Thymeleaf namespace -->
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Chef Details</title>
+
+    <!-- CSS стилови -->
+    <style type="text/css">
+        body {
+            width: 800px;
+            margin: auto;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color: #333;
+        }
+        ul {
+            list-style-type: none; /* Без bullets */
+            padding: 0;
+        }
+        li {
+            padding: 5px;
+            margin: 5px 0;
+            background-color: #f5f5f5; /* Светло сива позадина */
+            border-radius: 3px; /* Заоблени агли */
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #4CAF50; /* Зелена боја */
+            color: white;
+            text-decoration: none; /* Без подвлекување */
+            border-radius: 3px;
+        }
+        .back-link:hover {
+            background-color: #45a049; /* Потемна зелена при hover */
+        }
+        .no-dishes {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header со целото име на готвачот -->
+    <header>
+        <!-- th:text - динамички поставува текст -->
+        <!-- 'Chef: ' - статички текст -->
+        <!-- ${chef.firstName} - динамичка вредност од chef објектот -->
+        <!-- Резултат пример: Chef: Gordon Ramsay -->
+        <h1 th:text="'Chef: ' + ${chef.firstName} + ' ' + ${chef.lastName}"></h1>
+    </header>
+
+    <!-- Section со детали -->
+    <section>
+        <!-- Биографија на готвачот -->
+        <!-- th:text="${chef.bio}" - го прикажува bio полето -->
+        <h2 th:text="'Bio: ' + ${chef.bio}"></h2>
+
+        <!-- Наслов за листата на јадења -->
+        <h2>Dishes prepared by this chef:</h2>
+
+        <!-- th:if="${chef.dishes == null or chef.dishes.isEmpty()}" -->
+        <!-- Проверка: дали готвачот нема јадења -->
+        <!-- Ако условот е точен (true), прикажи го <p> елементот -->
+        <p th:if="${chef.dishes == null or chef.dishes.isEmpty()}" class="no-dishes">
+            This chef has no dishes yet.
+        </p>
+
+        <!-- th:unless="${chef.dishes == null or chef.dishes.isEmpty()}" -->
+        <!-- unless е спротивно од if - се прикажува ако условот е неточен (false) -->
+        <!-- Значи: прикажи ја листата ако готвачот ИМА јадења -->
+        <ul th:unless="${chef.dishes == null or chef.dishes.isEmpty()}">
+
+            <!-- th:each="dish : ${chef.dishes}" -->
+            <!-- Loop низ сите јадења на готвачот -->
+            <!-- За секое јадење, креира <li> елемент -->
+            <li th:each="dish : ${chef.dishes}">
+                <!-- th:text - динамички поставува текст -->
+                <!-- ${dish.name} - името на јадењето -->
+                <!-- ${dish.cuisine} - типот на кујна -->
+                <!-- ${dish.preparationTime} - време за подготовка -->
+                <!-- Резултат пример: Beef Wellington (British, 45 min) -->
+                <span th:text="${dish.name} + ' (' + ${dish.cuisine} + ', ' + ${dish.preparationTime} + ' min)'"></span>
+            </li>
+        </ul>
+
+        <!-- Link за враќање назад на почетната страница -->
+        <!-- th:href - динамички поставува href атрибут -->
+        <!-- @{/listChefs} - Thymeleaf URL синтакса, креира URL кон /listChefs -->
+        <a th:href="@{/listChefs}" class="back-link">Back to Chef List</a>
+    </section>
+</body>
+</html>

@@ -1,19 +1,23 @@
 package mk.ukim.finki.wp.lab.web; // Го дефинираме пакетот за web слојот
 
 // Импортираме ги потребните класи за сервлети
-import jakarta.servlet.ServletException; // Исклучок за грешки во сервлети
-import jakarta.servlet.annotation.WebServlet; // Анотација за мапирање на сервлет
-import jakarta.servlet.http.HttpServlet; // Базна класа за HTTP сервлети
-import jakarta.servlet.http.HttpServletRequest; // Објект што ги содржи податоците од HTTP барањето
-import jakarta.servlet.http.HttpServletResponse; // Објект за испраќање на HTTP одговор
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 // Импортираме ги нашите класи
-import mk.ukim.finki.wp.lab.model.Chef; // Нашата Chef класа
-import mk.ukim.finki.wp.lab.model.Dish; // Нашата Dish класа
-import mk.ukim.finki.wp.lab.service.ChefService; // Service за готвачи
+import mk.ukim.finki.wp.lab.model.Chef;
+import mk.ukim.finki.wp.lab.service.ChefService;
 
-import java.io.IOException; // Исклучок за I/O грешки
-import java.io.PrintWriter; // Класа за запишување на текст во response
+// Импортираме Thymeleaf класи
+import org.thymeleaf.context.WebContext;
+import org.thymeleaf.spring6.SpringTemplateEngine;
+import org.thymeleaf.web.IWebExchange;
+import org.thymeleaf.web.servlet.JakartaServletWebApplication;
+
+import java.io.IOException;
 
 /**
  * ChefDetailsServlet класа
@@ -22,13 +26,11 @@ import java.io.PrintWriter; // Класа за запишување на тек�
  * 1. Прима chefId и dishId од формата на DishServlet
  * 2. Го додава избраното јадење во листата на готвачот
  * 3. Ги прикажува сите детали за готвачот и неговите јадења
+ *
+ * Ажурирано да користи Thymeleaf template (chefDetails.html) наместо PrintWriter
  */
 @WebServlet(name = "ChefDetailsServlet", urlPatterns = "/chefDetails")
-// @WebServlet - анотација за регистрирање на сервлет
-// urlPatterns = "/chefDetails" - сервлетот е достапен на http://localhost:8080/chefDetails
-// Овој сервлет се повикува од формата во DishServlet (action="/chefDetails")
 public class ChefDetailsServlet extends HttpServlet {
-    // extends HttpServlet - ја наследуваме HttpServlet базната класа
 
     /**
      * Dependency на ChefService
@@ -39,14 +41,21 @@ public class ChefDetailsServlet extends HttpServlet {
     private final ChefService chefService;
 
     /**
+     * Dependency на SpringTemplateEngine
+     * Ни треба за да ги render-ираме Thymeleaf template фајловите
+     */
+    private final SpringTemplateEngine templateEngine;
+
+    /**
      * Конструктор со параметри
-     * Spring автоматски го инјектира ChefService bean-от
+     * Spring автоматски ги инјектира двата bean-ови
      *
      * @param chefService - service за готвачи (автоматски инјектиран од Spring)
+     * @param templateEngine - Thymeleaf engine (автоматски инјектиран од Spring)
      */
-    public ChefDetailsServlet(ChefService chefService) {
-        // Го иницијализираме dependency полето
+    public ChefDetailsServlet(ChefService chefService, SpringTemplateEngine templateEngine) {
         this.chefService = chefService;
+        this.templateEngine = templateEngine;
     }
 
     /**
@@ -59,7 +68,7 @@ public class ChefDetailsServlet extends HttpServlet {
      * @throws ServletException - се фрла ако има проблем во сервлетот
      * @throws IOException - се фрла ако има проблем со I/O операции
      */
-    @Override // Override-уваме метод од HttpServlet класата
+    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
@@ -87,99 +96,37 @@ public class ChefDetailsServlet extends HttpServlet {
         // Чекор 3: Го поставуваме content type на одговорот
         resp.setContentType("text/html; charset=UTF-8");
 
-        // Чекор 4: Го добиваме PrintWriter објектот за запишување на одговор
-        PrintWriter out = resp.getWriter();
+        // Чекор 4: Креираме Thymeleaf WebContext
+        // IWebExchange - Thymeleaf wrapper за request/response
+        IWebExchange webExchange = JakartaServletWebApplication
+                .buildApplication(getServletContext()) // Го креира Thymeleaf application од servlet контекстот
+                .buildExchange(req, resp); // Го креира web exchange од request и response
 
-        // Чекор 5: Пишуваме HTML код за прикажување на деталите
-        // Почеток на HTML документот
-        out.println("<!DOCTYPE html>");
-        out.println("<html>");
-        out.println("<head>");
-        out.println("    <meta charset=\"utf-8\">");
-        out.println("    <title>Chef Details</title>");
+        // WebContext - контекст за Thymeleaf template rendering
+        WebContext context = new WebContext(webExchange);
 
-        // CSS стилови
-        out.println("    <style type=\"text/css\">");
-        out.println("        body {");
-        out.println("            width: 800px;");
-        out.println("            margin: auto;"); // Центрирање
-        out.println("            font-family: Arial, sans-serif;");
-        out.println("        }");
-        out.println("        h1 {");
-        out.println("            color: #333;"); // Темна боја
-        out.println("        }");
-        out.println("        ul {");
-        out.println("            list-style-type: none;"); // Без bullets
-        out.println("            padding: 0;");
-        out.println("        }");
-        out.println("        li {");
-        out.println("            padding: 5px;");
-        out.println("            margin: 5px 0;");
-        out.println("            background-color: #f5f5f5;"); // Светло сива позадина
-        out.println("            border-radius: 3px;"); // Заоблени агли
-        out.println("        }");
-        out.println("        .back-link {");
-        out.println("            display: inline-block;");
-        out.println("            margin-top: 20px;");
-        out.println("            padding: 10px 15px;");
-        out.println("            background-color: #4CAF50;"); // Зелена боја
-        out.println("            color: white;");
-        out.println("            text-decoration: none;"); // Без подвлекување
-        out.println("            border-radius: 3px;");
-        out.println("        }");
-        out.println("        .back-link:hover {");
-        out.println("            background-color: #45a049;"); // Потемна зелена кога е hover
-        out.println("        }");
-        out.println("    </style>");
-        out.println("</head>");
-        out.println("<body>");
+        // Чекор 5: Ги додаваме променливите во контекстот
+        // "chef" - ажурираниот готвач со новото јадење (${chef} во template-от)
+        context.setVariable("chef", chef);
 
-        // Header со целото име на готвачот
-        out.println("    <header>");
-        out.println("        <h1>Chef: " + chef.getFirstName() + " " + chef.getLastName() + "</h1>");
-        out.println("    </header>");
+        // Чекор 6: Го render-ираме template-от
+        // templateEngine.process() - го процесира Thymeleaf template-от
+        // "chefDetails" - името на template фајлот (chefDetails.html)
+        // context - WebContext со променливите (chef)
+        // resp.getWriter() - Writer за испишување на резултатот
+        templateEngine.process("chefDetails", context, resp.getWriter());
 
-        // Section со детали
-        out.println("    <section>");
-        // Биографија на готвачот
-        out.println("        <h2>Bio: " + chef.getBio() + "</h2>");
-
-        // Наслов за листата на јадења
-        out.println("        <h2>Dishes prepared by this chef:</h2>");
-
-        // Проверка дали готвачот има јадења
-        if (chef.getDishes() == null || chef.getDishes().isEmpty()) {
-            // Ако нема јадења, прикажи порака
-            out.println("        <p>This chef has no dishes yet.</p>");
-        } else {
-            // Ако има јадења, прикажи ги во листа
-            out.println("        <ul>");
-
-            // Итерираме низ листата на јадења на готвачот
-            for (Dish dish : chef.getDishes()) {
-                // for (Dish dish : chef.getDishes()) - за секое јадење во листата
-
-                // Креираме list item за секое јадење
-                out.println("            <li>");
-                // Прикажуваме: Име (Кујна, Време за подготовка min)
-                // Пример: Beef Wellington (British, 45 min)
-                out.println("                " + dish.getName() +
-                           " (" + dish.getCuisine() + ", " +
-                           dish.getPreparationTime() + " min)");
-                out.println("            </li>");
-            }
-
-            out.println("        </ul>");
-        }
-
-        // Link за враќање назад на почетната страница
-        out.println("        <a href=\"/listChefs\" class=\"back-link\">Back to Chef List</a>");
-        out.println("    </section>");
-
-        out.println("</body>");
-        out.println("</html>");
-
-        // Важно: PrintWriter автоматски се затвора, не е потребно експлицитно close()
+        // Процесот:
+        // 1. Thymeleaf го чита chefDetails.html фајлот
+        // 2. Го наоѓа th:text="'Chef: ' + ${chef.firstName} + ' ' + ${chef.lastName}"
+        //    и го поставува насловот на целото име на готвачот
+        // 3. Го наоѓа th:text="'Bio: ' + ${chef.bio}" и ја прикажува биографијата
+        // 4. Проверува дали ${chef.dishes} е празна листа
+        // 5. Ако не е празна, го наоѓа th:each="dish : ${chef.dishes}"
+        //    и креира <li> елемент за секое јадење
+        // 6. За секое јадење, ги заменува ${dish.name}, ${dish.cuisine}, итн.
+        //    со вистинските вредности
+        // 7. Го испраќа финалниот HTML до клиентот
     }
 
     /**
@@ -200,21 +147,19 @@ public class ChefDetailsServlet extends HttpServlet {
         // Го поставуваме content type
         resp.setContentType("text/html; charset=UTF-8");
 
-        // Го добиваме PrintWriter
-        PrintWriter out = resp.getWriter();
-
-        // Прикажуваме информативна порака
-        out.println("<!DOCTYPE html>");
-        out.println("<html>");
-        out.println("<head>");
-        out.println("    <meta charset=\"utf-8\">");
-        out.println("    <title>Chef Details</title>");
-        out.println("</head>");
-        out.println("<body>");
-        out.println("    <h1>Chef Details</h1>");
-        out.println("    <p>Please select a chef and dish from the main page.</p>");
-        out.println("    <a href=\"/listChefs\">Go to Chef List</a>");
-        out.println("</body>");
-        out.println("</html>");
+        // Креираме едноставен HTML одговор (без template)
+        // Користиме getWriter() за испишување на текст
+        resp.getWriter().println("<!DOCTYPE html>");
+        resp.getWriter().println("<html>");
+        resp.getWriter().println("<head>");
+        resp.getWriter().println("    <meta charset=\"utf-8\">");
+        resp.getWriter().println("    <title>Chef Details</title>");
+        resp.getWriter().println("</head>");
+        resp.getWriter().println("<body>");
+        resp.getWriter().println("    <h1>Chef Details</h1>");
+        resp.getWriter().println("    <p>Please select a chef and dish from the main page.</p>");
+        resp.getWriter().println("    <a href=\"/listChefs\">Go to Chef List</a>");
+        resp.getWriter().println("</body>");
+        resp.getWriter().println("</html>");
     }
 }
