@@ -68,20 +68,15 @@ public class InMemoryChefRepository implements ChefRepository {
      */
     @Override
     public Chef save(Chef chef) {
-        // Прво, проверуваме дали готвачот веќе постои во листата
-        // DataHolder.chefs.stream() - го претвораме листата во stream
-        DataHolder.chefs.stream()
-                // .filter() - ги филтрираме готвачите што имаат исто ID како новиот готвач
-                .filter(c -> c.getId().equals(chef.getId()))
-                // .findFirst() - го наоѓа првиот (и единствен) готвач со тоа ID
-                // .ifPresent() - ако постои таков готвач, изврши ја lambda функцијата
-                .ifPresent(existingChef -> {
-                    // Ако готвачот постои, го бришеме од листата
-                    // DataHolder.chefs.remove() - го отстранува елементот од листата
-                    DataHolder.chefs.remove(existingChef);
-                });
-        // Откако го избришавме стариот (ако постоеше), го додаваме новиот/ажурираниот готвач
-        // DataHolder.chefs.add() - го додава готвачот на крајот од листата
+        // Прво, го бараме готвачот со исто ID во листата
+        // findById() враќа Optional<Chef>
+        Optional<Chef> existingChef = this.findById(chef.getId());
+
+        // Ако готвачот постои, го бришеме од листата
+        // .ifPresent() е метод на Optional - се извршува ако Optional содржи вредност
+        existingChef.ifPresent(c -> DataHolder.chefs.remove(c));
+
+        // Го додаваме (новиот или ажурираниот) готвач во листата
         DataHolder.chefs.add(chef);
 
         // Го враќаме зачуваниот готвач
