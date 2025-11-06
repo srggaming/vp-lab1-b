@@ -1,67 +1,32 @@
 <!DOCTYPE html>
-<!-- Thymeleaf template фајл за приказ на листа на готвачи -->
-<!-- xmlns:th="http://www.thymeleaf.org" - Thymeleaf namespace за да можеме да користиме th:* атрибути -->
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <!-- charset="utf-8" - поддршка за кирилични карактери -->
     <meta charset="utf-8">
     <title>Restaurant Chefs - Welcome to Our Restaurant</title>
-
-    <!-- CSS стилови за изглед на страницата -->
     <style type="text/css">
         body {
-            width: 800px; /* Ширина на страницата */
-            margin: auto; /* Центрирање на страницата */
-            font-family: Arial, sans-serif; /* Фонт */
+            width: 800px;
+            margin: auto;
+            font-family: Arial, sans-serif;
         }
         h1 {
-            color: #333; /* Боја на насловот */
+            color: #333;
         }
     </style>
 </head>
 <body>
-    <!-- Header со наслов -->
     <header>
         <h1>Welcome to Our Restaurant</h1>
     </header>
-
-    <!-- Main content -->
     <main>
         <h2>Choose a chef:</h2>
-
-        <!-- Форма за избор на готвач -->
-        <!-- action="/dish" - кога се submitува, праќа до /dish URL -->
-        <!-- method="POST" - користи POST метод за испраќање на податоци -->
         <form action="/dish" method="POST">
-
-            <!-- Thymeleaf th:each - loop низ листата на готвачи -->
-            <!-- th:each="chef : ${chefs}" - за секој chef од chefs листата -->
-            <!-- ${chefs} е променливата што сервлетот ја праќа до template-от -->
-
-            <!-- th:each креира еден <div> за секој готвач -->
             <div th:each="chef : ${chefs}">
-                <!-- Radio button за избор на готвач -->
-                <!-- type="radio" - само еден може да се избере -->
-                <!-- name="chefId" - името на полето што се праќа до серверот -->
-
-                <!-- th:value="${chef.id}" - динамички поставува value на ID-то на готвачот -->
-                <!-- Пример: ако chef.id е 1, ќе биде <input value="1"> -->
-                <input type="radio"
-                       name="chefId"
-                       th:value="${chef.id}">
-
-                <!-- Текст што се прикажува до radio button -->
-                <!-- th:text="${...}" - динамички поставува текст -->
-                <!-- ${chef.firstName} - го зема firstName полето од chef објектот -->
-                <!-- + ' ' + - конкатенација (спојување) на текстови -->
+                <input type="radio" name="chefId" th:value="${chef.id}">
                 <span th:text="'Name: ' + ${chef.firstName} + ' ' + ${chef.lastName} + ', Bio: ' + ${chef.bio}"></span>
-                <!-- Резултат пример: Name: Gordon Ramsay, Bio: World-renowned chef with 16 Michelin stars -->
-
                 <br/>
             </div>
-
             <br/>
-            <!-- Submit копче за испраќање на формата -->
             <input type="submit" value="Submit">
         </form>
     </main>

@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- pom.xml е главниот конфигурациски фајл за Maven проекти -->
-<!-- Тука ги дефинираме сите зависности (библиотеки) што ни требаат -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- Spring Boot Parent - ова е основниот Spring Boot проект од кој наследуваме -->
-    <!-- Parent проектот содржи предефинирани верзии на библиотеки -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -16,60 +12,47 @@
         <relativePath/>
     </parent>
 
-    <!-- Информации за нашиот проект -->
-    <groupId>mk.ukim.finki.wp</groupId> <!-- Групно ID - обично е пакетното име обратно -->
-    <artifactId>lab</artifactId> <!-- Име на артефактот/проектот -->
-    <version>0.0.1-SNAPSHOT</version> <!-- Верзија на проектот -->
-    <name>lab</name> <!-- Човечки читливо име -->
-    <description>Web Programming Lab 1</description> <!-- Опис на проектот -->
+    <groupId>mk.ukim.finki.wp</groupId>
+    <artifactId>lab</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>lab</name>
+    <description>Web Programming Lab 1</description>
 
     <properties>
-        <!-- Верзија на Java што ја користиме -->
         <java.version>17</java.version>
     </properties>
 
     <dependencies>
-        <!-- Spring Boot Starter Web - содржи сè за web апликации -->
-        <!-- Вклучува Tomcat сервер, Spring MVC, Jackson за JSON, итн. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Spring Boot Starter Thymeleaf - template engine за динамичко генерирање на HTML -->
-        <!-- Thymeleaf овозможува да креираме HTML фајлови со специјални атрибути за динамички content -->
-        <!-- Пример: <li th:each="chef : ${chefs}"> ќе креира list item за секој готвач -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
-        <!-- Lombok - библиотека за автоматско генерирање на boilerplate код -->
-        <!-- Генерира getters, setters, конструктори, toString, итн. -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
 
-        <!-- Spring Boot Starter Test - библиотеки за тестирање -->
-        <!-- Вклучува JUnit, Mockito, AssertJ, итн. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope> <!-- Се користи само при тестирање -->
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Spring Boot Maven Plugin - за пакување и стартување на апликацијата -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <!-- Lombok не треба да биде вклучен во финалниот JAR -->
                         <exclude>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>

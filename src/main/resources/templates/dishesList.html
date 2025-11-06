@@ -1,12 +1,8 @@
 <!DOCTYPE html>
-<!-- Thymeleaf template фајл за приказ на листа на јадења -->
-<!-- xmlns:th="http://www.thymeleaf.org" - Thymeleaf namespace -->
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <title>Add Dish to Chef</title>
-
-    <!-- CSS стилови -->
     <style type="text/css">
         body {
             width: 800px;
@@ -16,86 +12,53 @@
         table {
             width: 100%;
             margin-top: 20px;
-            border-collapse: collapse; /* Без празно место меѓу border-ите */
+            border-collapse: collapse;
         }
         table, td, th {
-            border: 1px solid black; /* Граница од 1px */
-            padding: 10px; /* Внатрешен простор */
+            border: 1px solid black;
+            padding: 10px;
         }
         th {
-            background-color: #4CAF50; /* Зелена позадина за header */
-            color: white; /* Бел текст */
+            background-color: #4CAF50;
+            color: white;
         }
         section {
-            float: left; /* Лево порамнување */
+            float: left;
             margin: 0 1.5%;
             width: 63%;
         }
         aside {
-            float: right; /* Десно порамнување */
+            float: right;
             margin: 0 1.5%;
             width: 30%;
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
     <header>
         <h1>Select the Dish to add to the Chef</h1>
     </header>
-
-    <!-- Section - лева страна со јадењата -->
     <section>
         <h2>Select dish:</h2>
-
-        <!-- Форма за избор на јадење -->
-        <!-- action="/chefDetails" - праќа до ChefDetailsServlet -->
         <form action="/chefDetails" method="POST">
-
-            <!-- Hidden input - го праќа chefId до следниот сервлет -->
-            <!-- type="hidden" - не се гледа на страницата, но се испраќа со формата -->
-            <!-- th:value="${selectedChef.id}" - динамички поставува ID на избраниот готвач -->
-            <input type="hidden"
-                   name="chefId"
-                   th:value="${selectedChef.id}">
-
-            <!-- Thymeleaf th:each - loop низ листата на јадења -->
-            <!-- th:each="dish : ${dishes}" - за секое јадење од dishes листата -->
+            <input type="hidden" name="chefId" th:value="${selectedChef.id}">
             <div th:each="dish : ${dishes}">
-                <!-- Radio button за избор на јадење -->
-                <input type="radio"
-                       name="dishId"
-                       th:value="${dish.dishId}">
-
-                <!-- Текст што се прикажува до radio button -->
-                <!-- th:text динамички го поставува текстот -->
-                <!-- ${dish.name} - името на јадењето -->
-                <!-- ${dish.cuisine} - типот на кујна -->
-                <!-- ${dish.preparationTime} - време за подготовка -->
+                <input type="radio" name="dishId" th:value="${dish.dishId}">
                 <span th:text="${dish.name} + ' (' + ${dish.cuisine} + ', ' + ${dish.preparationTime} + ' min)'"></span>
-                <!-- Резултат пример: Pasta Carbonara (Italian, 30 min) -->
-
                 <br/>
             </div>
-
             <br/>
-            <!-- Submit копче -->
             <input type="submit" value="Add dish">
         </form>
     </section>
-
-    <!-- Aside - десна страна со информации за готвачот -->
     <aside>
         <table>
             <tr>
                 <td><b>Chef ID</b></td>
-                <!-- th:text="${selectedChef.id}" - динамички прикажува ID на готвачот -->
                 <td th:text="${selectedChef.id}"></td>
             </tr>
             <tr>
                 <td><b>Chef Name</b></td>
-                <!-- th:text="${selectedChef.firstName} + ' ' + ${selectedChef.lastName}" -->
-                <!-- Динамички прикажува целото име (име + презиме) -->
                 <td th:text="${selectedChef.firstName} + ' ' + ${selectedChef.lastName}"></td>
             </tr>
         </table>
