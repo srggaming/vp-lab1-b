@@ -34,6 +34,9 @@ public class ChefServiceImpl implements ChefService {
 
     @Override
     public Chef addDishToChef(Long chefId, String dishId) {
+        if (dishId == null || dishId.trim().isEmpty()) {
+            throw new RuntimeException("Dish ID cannot be empty");
+        }
         Chef chef = this.findById(chefId);
         Dish dish = this.dishRepository.findByDishId(dishId);
         if (dish == null) {
