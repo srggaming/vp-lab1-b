@@ -36,12 +36,15 @@
             <span th:text="${mostPopularChef.firstName} + ' ' + ${mostPopularChef.lastName} + ' with ' + ${mostPopularChef.dishes.size()} + ' dish(es)'"></span>
         </div>
         <form action="/dish" method="POST">
-            <div th:each="chef : ${chefs}">
+            <div th:each="chef : ${chefs}" style="margin-bottom: 15px;">
                 <input type="radio" name="chefId" th:value="${chef.id}">
                 <span th:text="'Name: ' + ${chef.firstName} + ' ' + ${chef.lastName} + ', Bio: ' + ${chef.bio}"
                       th:classappend="${mostPopularChef != null and chef.id == mostPopularChef.id} ? 'most-popular' : ''"></span>
                 <span th:if="${mostPopularChef != null and chef.id == mostPopularChef.id}" class="popular-badge">⭐ MOST POPULAR</span>
                 <br/>
+                <small style="margin-left: 20px; color: #666;">
+                    <strong>Statistics:</strong> <span th:text="${chef.dishes.size()} + ' dish(es)'"></span>
+                </small>
             </div>
             <br/>
             <input type="submit" value="Submit">
