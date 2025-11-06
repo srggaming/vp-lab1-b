@@ -12,6 +12,17 @@
         h1 {
             color: #333;
         }
+        .most-popular {
+            background-color: #ffd700;
+            padding: 5px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .popular-badge {
+            color: #ff6347;
+            font-weight: bold;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -20,10 +31,16 @@
     </header>
     <main>
         <h2>Choose a chef:</h2>
+        <div th:if="${mostPopularChef != null}" style="margin-bottom: 10px; padding: 10px; background-color: #f0f8ff; border-left: 4px solid #ffd700;">
+            <strong>Most Popular Chef:</strong>
+            <span th:text="${mostPopularChef.firstName} + ' ' + ${mostPopularChef.lastName} + ' with ' + ${mostPopularChef.dishes.size()} + ' dish(es)'"></span>
+        </div>
         <form action="/dish" method="POST">
             <div th:each="chef : ${chefs}">
                 <input type="radio" name="chefId" th:value="${chef.id}">
-                <span th:text="'Name: ' + ${chef.firstName} + ' ' + ${chef.lastName} + ', Bio: ' + ${chef.bio}"></span>
+                <span th:text="'Name: ' + ${chef.firstName} + ' ' + ${chef.lastName} + ', Bio: ' + ${chef.bio}"
+                      th:classappend="${mostPopularChef != null and chef.id == mostPopularChef.id} ? 'most-popular' : ''"></span>
+                <span th:if="${mostPopularChef != null and chef.id == mostPopularChef.id}" class="popular-badge">⭐ MOST POPULAR</span>
                 <br/>
             </div>
             <br/>

@@ -31,6 +31,7 @@ public class ChefListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         List<Chef> chefs = this.chefService.listChefs();
+        Chef mostPopularChef = this.chefService.findMostPopularChef().orElse(null);
         resp.setContentType("text/html; charset=UTF-8");
 
         IWebExchange webExchange = JakartaServletWebApplication
@@ -38,6 +39,7 @@ public class ChefListServlet extends HttpServlet {
                 .buildExchange(req, resp);
         WebContext context = new WebContext(webExchange);
         context.setVariable("chefs", chefs);
+        context.setVariable("mostPopularChef", mostPopularChef);
 
         templateEngine.process("listChefs", context, resp.getWriter());
     }
