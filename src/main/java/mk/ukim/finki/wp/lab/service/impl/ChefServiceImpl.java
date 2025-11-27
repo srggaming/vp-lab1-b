@@ -51,4 +51,28 @@ public class ChefServiceImpl implements ChefService {
         return this.chefRepository.findAll().stream()
                 .max(Comparator.comparingInt(chef -> chef.getDishes().size()));
     }
+
+    @Override
+    public Chef create(String firstName, String lastName, String bio) {
+        Long newId = this.chefRepository.findAll().stream()
+                .mapToLong(Chef::getId)
+                .max()
+                .orElse(0L) + 1;
+        Chef chef = new Chef(newId, firstName, lastName, bio);
+        return this.chefRepository.save(chef);
+    }
+
+    @Override
+    public Chef update(Long id, String firstName, String lastName, String bio) {
+        Chef chef = this.findById(id);
+        chef.setFirstName(firstName);
+        chef.setLastName(lastName);
+        chef.setBio(bio);
+        return this.chefRepository.save(chef);
+    }
+
+    @Override
+    public void delete(Long id) {
+        this.chefRepository.deleteById(id);
+    }
 }
