@@ -7,7 +7,9 @@ import mk.ukim.finki.wp.lab.repository.DishRepository;
 import mk.ukim.finki.wp.lab.service.ChefService;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ChefServiceImpl implements ChefService {
@@ -32,9 +34,21 @@ public class ChefServiceImpl implements ChefService {
 
     @Override
     public Chef addDishToChef(Long chefId, String dishId) {
+        if (dishId == null || dishId.trim().isEmpty()) {
+            throw new RuntimeException("Dish ID cannot be empty");
+        }
         Chef chef = this.findById(chefId);
         Dish dish = this.dishRepository.findByDishId(dishId);
+        if (dish == null) {
+            throw new RuntimeException("Dish not found with id: " + dishId);
+        }
         chef.getDishes().add(dish);
         return this.chefRepository.save(chef);
+    }
+
+    @Override
+    public Optional<Chef> findMostPopularChef() {
+        return this.chefRepository.findAll().stream()
+                .max(Comparator.comparingInt(chef -> chef.getDishes().size()));
     }
 }

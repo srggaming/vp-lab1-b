@@ -15,7 +15,9 @@ import org.thymeleaf.web.IWebExchange;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @WebServlet(name = "ChefListServlet", urlPatterns = "/listChefs")
 public class ChefListServlet extends HttpServlet {
@@ -30,7 +32,10 @@ public class ChefListServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        List<Chef> chefs = this.chefService.listChefs();
+        List<Chef> chefs = this.chefService.listChefs().stream()
+                .sorted(Comparator.comparingInt((Chef chef) -> chef.getDishes().size()).reversed())
+                .collect(Collectors.toList());
+        Chef mostPopularChef = this.chefService.findMostPopularChef().orElse(null);
         resp.setContentType("text/html; charset=UTF-8");
 
         IWebExchange webExchange = JakartaServletWebApplication
@@ -38,6 +43,7 @@ public class ChefListServlet extends HttpServlet {
                 .buildExchange(req, resp);
         WebContext context = new WebContext(webExchange);
         context.setVariable("chefs", chefs);
+        context.setVariable("mostPopularChef", mostPopularChef);
 
         templateEngine.process("listChefs", context, resp.getWriter());
     }

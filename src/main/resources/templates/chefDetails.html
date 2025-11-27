@@ -51,7 +51,7 @@
             This chef has no dishes yet.
         </p>
         <ul th:unless="${chef.dishes == null or chef.dishes.isEmpty()}">
-            <li th:each="dish : ${chef.dishes}">
+            <li th:each="dish : ${chef.dishes}" th:if="${dish != null}">
                 <span th:text="${dish.name} + ' (' + ${dish.cuisine} + ', ' + ${dish.preparationTime} + ' min)'"></span>
             </li>
         </ul>

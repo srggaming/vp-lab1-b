@@ -40,7 +40,7 @@
     </header>
     <section>
         <h2>Select dish:</h2>
-        <form action="/chefDetails" method="POST">
+        <form action="/chefDetails" method="POST" onsubmit="return validateDishSelection()">
             <input type="hidden" name="chefId" th:value="${selectedChef.id}">
             <div th:each="dish : ${dishes}">
                 <input type="radio" name="dishId" th:value="${dish.dishId}">
@@ -51,6 +51,16 @@
             <input type="submit" value="Add dish">
         </form>
     </section>
+    <script>
+        function validateDishSelection() {
+            var dishId = document.querySelector('input[name="dishId"]:checked');
+            if (!dishId) {
+                alert('Please select a dish before submitting!');
+                return false;
+            }
+            return true;
+        }
+    </script>
     <aside>
         <table>
             <tr>
