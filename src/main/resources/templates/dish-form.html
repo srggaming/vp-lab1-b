@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title th:text="${dish != null ? 'Edit Dish' : 'Add New Dish'}">Dish Form</title>
+    <style type="text/css">
+        body {
+            width: 800px;
+            margin: auto;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+        .button-group {
+            margin-top: 20px;
+        }
+        button, .back-link {
+            padding: 10px 20px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+        }
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .back-link {
+            background-color: #666;
+            color: white;
+        }
+        .back-link:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 th:text="${dish != null ? 'Edit Dish' : 'Add New Dish'}">Dish Form</h1>
+    </header>
+    <main>
+        <form th:action="${dish != null ? '/dishes/edit/' + dish.id : '/dishes/add'}" method="POST">
+            <div class="form-group">
+                <label for="dishId">Dish ID:</label>
+                <input type="text" id="dishId" name="dishId" th:value="${dish != null ? dish.dishId : ''}" required>
+            </div>
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" th:value="${dish != null ? dish.name : ''}" required>
+            </div>
+            <div class="form-group">
+                <label for="cuisine">Cuisine:</label>
+                <input type="text" id="cuisine" name="cuisine" th:value="${dish != null ? dish.cuisine : ''}" required>
+            </div>
+            <div class="form-group">
+                <label for="preparationTime">Preparation Time (minutes):</label>
+                <input type="number" id="preparationTime" name="preparationTime"
+                       th:value="${dish != null ? dish.preparationTime : ''}" min="1" required>
+            </div>
+            <div class="button-group">
+                <button type="submit" th:text="${dish != null ? 'Update Dish' : 'Add Dish'}">Submit</button>
+                <a th:href="@{/dishes}" class="back-link">Cancel</a>
+            </div>
+        </form>
+    </main>
+</body>
+</html>
