@@ -22,10 +22,18 @@ public class DishController {
     }
 
     @GetMapping
-    public String getDishesPage(@RequestParam(required = false) String error, Model model) {
-        List<Dish> dishes = this.dishService.listDishes();
+    public String getDishesPage(@RequestParam(required = false) String error,
+                                 @RequestParam(required = false) Integer rating,
+                                 Model model) {
+        List<Dish> dishes;
+        if (rating != null) {
+            dishes = this.dishService.findAllByRating(rating);
+        } else {
+            dishes = this.dishService.listDishes();
+        }
         model.addAttribute("dishes", dishes);
         model.addAttribute("error", error);
+        model.addAttribute("selectedRating", rating);
         return "listDishes";
     }
 
@@ -55,8 +63,9 @@ public class DishController {
                            @RequestParam String name,
                            @RequestParam String cuisine,
                            @RequestParam int preparationTime,
-                           @RequestParam(required = false) Long chefId) {
-        this.dishService.create(dishId, name, cuisine, preparationTime, chefId);
+                           @RequestParam(required = false) Long chefId,
+                           @RequestParam(required = false) Integer rating) {
+        this.dishService.create(dishId, name, cuisine, preparationTime, chefId, rating);
         return "redirect:/dishes";
     }
 
@@ -66,8 +75,9 @@ public class DishController {
                            @RequestParam String name,
                            @RequestParam String cuisine,
                            @RequestParam int preparationTime,
-                           @RequestParam(required = false) Long chefId) {
-        this.dishService.update(id, dishId, name, cuisine, preparationTime, chefId);
+                           @RequestParam(required = false) Long chefId,
+                           @RequestParam(required = false) Integer rating) {
+        this.dishService.update(id, dishId, name, cuisine, preparationTime, chefId, rating);
         return "redirect:/dishes";
     }
 

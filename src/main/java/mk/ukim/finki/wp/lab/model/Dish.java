@@ -20,6 +20,7 @@ public class Dish {
     private String name;
     private String cuisine;
     private int preparationTime;
+    private Integer rating; // Rating 1-5 stars
 
     @ManyToOne
     @JoinColumn(name = "chef_id")
@@ -30,5 +31,13 @@ public class Dish {
         this.name = name;
         this.cuisine = cuisine;
         this.preparationTime = preparationTime;
+    }
+
+    public Dish(String dishId, String name, String cuisine, int preparationTime, Integer rating) {
+        this.dishId = dishId;
+        this.name = name;
+        this.cuisine = cuisine;
+        this.preparationTime = preparationTime;
+        this.rating = rating;
     }
 }

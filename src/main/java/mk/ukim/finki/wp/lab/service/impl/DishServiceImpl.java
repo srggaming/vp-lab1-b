@@ -36,23 +36,24 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
-    public Dish create(String dishId, String name, String cuisine, int preparationTime, Long chefId) {
+    public Dish create(String dishId, String name, String cuisine, int preparationTime, Long chefId, Integer rating) {
         Chef chef = null;
         if (chefId != null) {
             chef = chefRepository.findById(chefId).orElse(null);
         }
-        Dish dish = new Dish(dishId, name, cuisine, preparationTime);
+        Dish dish = new Dish(dishId, name, cuisine, preparationTime, rating);
         dish.setChef(chef);
         return this.dishRepository.save(dish);
     }
 
     @Override
-    public Dish update(Long id, String dishId, String name, String cuisine, int preparationTime, Long chefId) {
+    public Dish update(Long id, String dishId, String name, String cuisine, int preparationTime, Long chefId, Integer rating) {
         Dish dish = this.findById(id);
         dish.setDishId(dishId);
         dish.setName(name);
         dish.setCuisine(cuisine);
         dish.setPreparationTime(preparationTime);
+        dish.setRating(rating);
 
         if (chefId != null) {
             Chef chef = chefRepository.findById(chefId).orElse(null);
@@ -72,5 +73,10 @@ public class DishServiceImpl implements DishService {
     @Override
     public List<Dish> findAllByChefId(Long chefId) {
         return this.dishRepository.findAllByChef_Id(chefId);
+    }
+
+    @Override
+    public List<Dish> findAllByRating(Integer rating) {
+        return this.dishRepository.findAllByRating(rating);
     }
 }

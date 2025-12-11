@@ -35,12 +35,12 @@ public class DataInitializer implements CommandLineRunner {
             chefRepository.save(chef4);
             chefRepository.save(chef5);
 
-            // Create dishes
-            Dish dish1 = new Dish("1", "Pasta Carbonara", "Italian", 30);
-            Dish dish2 = new Dish("2", "Beef Wellington", "British", 45);
-            Dish dish3 = new Dish("3", "Chicken Tikka Masala", "Indian", 40);
-            Dish dish4 = new Dish("4", "Sushi Platter", "Japanese", 50);
-            Dish dish5 = new Dish("5", "Coq au Vin", "French", 60);
+            // Create dishes with ratings (1-5 stars)
+            Dish dish1 = new Dish("1", "Pasta Carbonara", "Italian", 30, 5);
+            Dish dish2 = new Dish("2", "Beef Wellington", "British", 45, 5);
+            Dish dish3 = new Dish("3", "Chicken Tikka Masala", "Indian", 40, 4);
+            Dish dish4 = new Dish("4", "Sushi Platter", "Japanese", 50, 4);
+            Dish dish5 = new Dish("5", "Coq au Vin", "French", 60, 5);
 
             // Optionally assign chefs to dishes
             dish1.setChef(chef2); // Jamie Oliver - Italian cuisine
