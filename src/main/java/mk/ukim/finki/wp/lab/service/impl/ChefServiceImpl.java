@@ -2,8 +2,8 @@ package mk.ukim.finki.wp.lab.service.impl;
 
 import mk.ukim.finki.wp.lab.model.Chef;
 import mk.ukim.finki.wp.lab.model.Dish;
-import mk.ukim.finki.wp.lab.repository.ChefRepository;
-import mk.ukim.finki.wp.lab.repository.DishRepository;
+import mk.ukim.finki.wp.lab.repository.jpa.JpaChefRepository;
+import mk.ukim.finki.wp.lab.repository.jpa.JpaDishRepository;
 import mk.ukim.finki.wp.lab.service.ChefService;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +13,10 @@ import java.util.Optional;
 
 @Service
 public class ChefServiceImpl implements ChefService {
-    private final ChefRepository chefRepository;
-    private final DishRepository dishRepository;
+    private final JpaChefRepository chefRepository;
+    private final JpaDishRepository dishRepository;
 
-    public ChefServiceImpl(ChefRepository chefRepository, DishRepository dishRepository) {
+    public ChefServiceImpl(JpaChefRepository chefRepository, JpaDishRepository dishRepository) {
         this.chefRepository = chefRepository;
         this.dishRepository = dishRepository;
     }
@@ -42,8 +42,10 @@ public class ChefServiceImpl implements ChefService {
         if (dish == null) {
             throw new RuntimeException("Dish not found with id: " + dishId);
         }
-        chef.getDishes().add(dish);
-        return this.chefRepository.save(chef);
+        // Update the owning side of the relationship
+        dish.setChef(chef);
+        this.dishRepository.save(dish);
+        return chef;
     }
 
     @Override
@@ -54,11 +56,7 @@ public class ChefServiceImpl implements ChefService {
 
     @Override
     public Chef create(String firstName, String lastName, String bio) {
-        Long newId = this.chefRepository.findAll().stream()
-                .mapToLong(Chef::getId)
-                .max()
-                .orElse(0L) + 1;
-        Chef chef = new Chef(newId, firstName, lastName, bio);
+        Chef chef = new Chef(firstName, lastName, bio);
         return this.chefRepository.save(chef);
     }
 

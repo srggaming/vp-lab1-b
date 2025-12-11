@@ -26,7 +26,8 @@
             margin-bottom: 5px;
         }
         input[type="text"],
-        input[type="number"] {
+        input[type="number"],
+        select {
             width: 100%;
             padding: 8px;
             border: 1px solid #ddd;
@@ -83,6 +84,17 @@
                 <label for="preparationTime">Preparation Time (minutes):</label>
                 <input type="number" id="preparationTime" name="preparationTime"
                        th:value="${dish != null ? dish.preparationTime : ''}" min="1" required>
+            </div>
+            <div class="form-group">
+                <label for="chefId">Chef (Optional):</label>
+                <select id="chefId" name="chefId">
+                    <option value="">-- No Chef Assigned --</option>
+                    <option th:each="chef : ${chefs}"
+                            th:value="${chef.id}"
+                            th:text="${chef.firstName + ' ' + chef.lastName}"
+                            th:selected="${dish != null and dish.chef != null and dish.chef.id == chef.id}">
+                    </option>
+                </select>
             </div>
             <div class="button-group">
                 <button type="submit" th:text="${dish != null ? 'Update Dish' : 'Add Dish'}">Submit</button>
