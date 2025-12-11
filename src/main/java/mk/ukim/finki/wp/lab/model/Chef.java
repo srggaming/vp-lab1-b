@@ -23,7 +23,7 @@ public class Chef {
     @Column(length = 1000)
     private String bio;
 
-    @OneToMany(mappedBy = "chef", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "chef", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Dish> dishes = new ArrayList<>();
 
     public Chef(String firstName, String lastName, String bio) {
