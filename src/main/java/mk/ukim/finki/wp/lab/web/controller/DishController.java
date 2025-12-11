@@ -1,6 +1,8 @@
 package mk.ukim.finki.wp.lab.web.controller;
 
+import mk.ukim.finki.wp.lab.model.Chef;
 import mk.ukim.finki.wp.lab.model.Dish;
+import mk.ukim.finki.wp.lab.service.ChefService;
 import mk.ukim.finki.wp.lab.service.DishService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,9 +14,11 @@ import java.util.List;
 @RequestMapping("/dishes")
 public class DishController {
     private final DishService dishService;
+    private final ChefService chefService;
 
-    public DishController(DishService dishService) {
+    public DishController(DishService dishService, ChefService chefService) {
         this.dishService = dishService;
+        this.chefService = chefService;
     }
 
     @GetMapping
@@ -28,6 +32,8 @@ public class DishController {
     @GetMapping("/dish-form")
     public String getAddDishPage(Model model) {
         model.addAttribute("dish", null);
+        List<Chef> chefs = this.chefService.listChefs();
+        model.addAttribute("chefs", chefs);
         return "dish-form";
     }
 
@@ -36,6 +42,8 @@ public class DishController {
         try {
             Dish dish = this.dishService.findById(id);
             model.addAttribute("dish", dish);
+            List<Chef> chefs = this.chefService.listChefs();
+            model.addAttribute("chefs", chefs);
             return "dish-form";
         } catch (RuntimeException e) {
             return "redirect:/dishes?error=DishNotFound";
@@ -46,8 +54,9 @@ public class DishController {
     public String saveDish(@RequestParam String dishId,
                            @RequestParam String name,
                            @RequestParam String cuisine,
-                           @RequestParam int preparationTime) {
-        this.dishService.create(dishId, name, cuisine, preparationTime);
+                           @RequestParam int preparationTime,
+                           @RequestParam(required = false) Long chefId) {
+        this.dishService.create(dishId, name, cuisine, preparationTime, chefId);
         return "redirect:/dishes";
     }
 
@@ -56,8 +65,9 @@ public class DishController {
                            @RequestParam String dishId,
                            @RequestParam String name,
                            @RequestParam String cuisine,
-                           @RequestParam int preparationTime) {
-        this.dishService.update(id, dishId, name, cuisine, preparationTime);
+                           @RequestParam int preparationTime,
+                           @RequestParam(required = false) Long chefId) {
+        this.dishService.update(id, dishId, name, cuisine, preparationTime, chefId);
         return "redirect:/dishes";
     }
 
