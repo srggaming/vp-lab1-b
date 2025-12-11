@@ -86,6 +86,45 @@
         .back-link:hover {
             background-color: #555;
         }
+        .filter-form {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        .filter-form label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .filter-form select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            margin-right: 10px;
+        }
+        .filter-form button {
+            padding: 8px 15px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .filter-form button:hover {
+            background-color: #0b7dda;
+        }
+        .filter-form a {
+            padding: 8px 15px;
+            background-color: #666;
+            color: white;
+            text-decoration: none;
+            border-radius: 3px;
+            margin-left: 5px;
+        }
+        .filter-form a:hover {
+            background-color: #555;
+        }
     </style>
 </head>
 <body>
@@ -97,6 +136,20 @@
             <strong>Error:</strong> <span th:text="${error}">Error message</span>
         </div>
 
+        <form class="filter-form" method="GET" action="/dishes">
+            <label for="rating">Filter by Rating:</label>
+            <select id="rating" name="rating">
+                <option value="">-- All Ratings --</option>
+                <option value="1" th:selected="${selectedRating == 1}">⭐ (1 star)</option>
+                <option value="2" th:selected="${selectedRating == 2}">⭐⭐ (2 stars)</option>
+                <option value="3" th:selected="${selectedRating == 3}">⭐⭐⭐ (3 stars)</option>
+                <option value="4" th:selected="${selectedRating == 4}">⭐⭐⭐⭐ (4 stars)</option>
+                <option value="5" th:selected="${selectedRating == 5}">⭐⭐⭐⭐⭐ (5 stars)</option>
+            </select>
+            <button type="submit">🔍 Filter</button>
+            <a th:href="@{/dishes}">Clear Filter</a>
+        </form>
+
         <a th:href="@{/dishes/dish-form}" class="add-button">➕ Add New Dish</a>
 
         <table>
@@ -107,6 +160,7 @@
                     <th>Name</th>
                     <th>Cuisine</th>
                     <th>Preparation Time (min)</th>
+                    <th>Rating</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -117,6 +171,14 @@
                     <td th:text="${dish.name}">Pasta Carbonara</td>
                     <td th:text="${dish.cuisine}">Italian</td>
                     <td th:text="${dish.preparationTime}">30</td>
+                    <td>
+                        <span th:if="${dish.rating == 1}">⭐</span>
+                        <span th:if="${dish.rating == 2}">⭐⭐</span>
+                        <span th:if="${dish.rating == 3}">⭐⭐⭐</span>
+                        <span th:if="${dish.rating == 4}">⭐⭐⭐⭐</span>
+                        <span th:if="${dish.rating == 5}">⭐⭐⭐⭐⭐</span>
+                        <span th:if="${dish.rating == null}" style="color: #999;">No rating</span>
+                    </td>
                     <td class="action-buttons">
                         <a th:href="@{/dishes/dish-form/{id}(id=${dish.id})}" class="edit-button">✏️ Edit</a>
                         <a th:href="@{/dishes/delete/{id}(id=${dish.id})}"
@@ -125,7 +187,7 @@
                     </td>
                 </tr>
                 <tr th:if="${dishes.isEmpty()}">
-                    <td colspan="6" style="text-align: center; color: #666; font-style: italic;">
+                    <td colspan="7" style="text-align: center; color: #666; font-style: italic;">
                         No dishes available. Click "Add New Dish" to add one.
                     </td>
                 </tr>

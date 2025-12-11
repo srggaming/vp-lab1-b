@@ -86,6 +86,17 @@
                        th:value="${dish != null ? dish.preparationTime : ''}" min="1" required>
             </div>
             <div class="form-group">
+                <label for="rating">Rating (1-5 stars):</label>
+                <select id="rating" name="rating">
+                    <option value="">-- Select Rating --</option>
+                    <option value="1" th:selected="${dish != null and dish.rating == 1}">⭐ (1 star)</option>
+                    <option value="2" th:selected="${dish != null and dish.rating == 2}">⭐⭐ (2 stars)</option>
+                    <option value="3" th:selected="${dish != null and dish.rating == 3}">⭐⭐⭐ (3 stars)</option>
+                    <option value="4" th:selected="${dish != null and dish.rating == 4}">⭐⭐⭐⭐ (4 stars)</option>
+                    <option value="5" th:selected="${dish != null and dish.rating == 5}">⭐⭐⭐⭐⭐ (5 stars)</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="chefId">Chef (Optional):</label>
                 <select id="chefId" name="chefId">
                     <option value="">-- No Chef Assigned --</option>
