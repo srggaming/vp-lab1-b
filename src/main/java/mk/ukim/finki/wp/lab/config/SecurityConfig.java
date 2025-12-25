@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -37,14 +38,27 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         // Public access - read-only pages
-                        .requestMatchers("/", "/dishes", "/chefs", "/listChefs").permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/dishes")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/chefs")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/listChefs")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/dish")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/chefDetails")).permitAll()
                         // Admin only - forms and modification endpoints
-                        .requestMatchers("/dishes/dish-form/**", "/dishes/add", "/dishes/edit/**", "/dishes/delete/**").hasRole("ADMIN")
-                        .requestMatchers("/chefs/chef-form/**", "/chefs/add", "/chefs/edit/**", "/chefs/delete/**").hasRole("ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/dishes/dish-form/**")).hasRole("ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/dishes/add")).hasRole("ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/dishes/edit/**")).hasRole("ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/dishes/delete/**")).hasRole("ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/chefs/chef-form/**")).hasRole("ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/chefs/add")).hasRole("ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/chefs/edit/**")).hasRole("ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/chefs/delete/**")).hasRole("ADMIN")
                         // Static resources
-                        .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/css/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/js/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/images/**")).permitAll()
                         // H2 Console
-                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
                         // All other requests require authentication
                         .anyRequest().authenticated()
                 )
@@ -57,7 +71,7 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/h2-console/**")
+                        .ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**"))
                 )
                 .headers(headers -> headers
                         .frameOptions().sameOrigin()
