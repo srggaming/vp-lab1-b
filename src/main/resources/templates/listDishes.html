@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="utf-8">
     <title>Dishes Management</title>
@@ -125,11 +126,54 @@
         .filter-form a:hover {
             background-color: #555;
         }
+        .auth-section {
+            float: right;
+            margin-bottom: 20px;
+        }
+        .login-button, .logout-button {
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 3px;
+            color: white;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        .login-button {
+            background-color: #4CAF50;
+        }
+        .login-button:hover {
+            background-color: #45a049;
+        }
+        .logout-button {
+            background-color: #f44336;
+        }
+        .logout-button:hover {
+            background-color: #da190b;
+        }
+        .user-info {
+            display: inline-block;
+            color: #333;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        header {
+            overflow: auto;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <header>
-        <h1>Dishes Management</h1>
+        <h1 style="float: left;">Dishes Management</h1>
+        <div class="auth-section">
+            <span sec:authorize="isAuthenticated()" class="user-info">
+                Welcome, <span sec:authentication="name"></span>!
+            </span>
+            <a sec:authorize="!isAuthenticated()" th:href="@{/login}" class="login-button">🔐 Login</a>
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="logout-button">🚪 Logout</button>
+            </form>
+        </div>
     </header>
     <main>
         <div th:if="${error}" class="error">
@@ -150,7 +194,7 @@
             <a th:href="@{/dishes}">Clear Filter</a>
         </form>
 
-        <a th:href="@{/dishes/dish-form}" class="add-button">➕ Add New Dish</a>
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{/dishes/dish-form}" class="add-button">➕ Add New Dish</a>
 
         <table>
             <thead>
@@ -180,10 +224,11 @@
                         <span th:if="${dish.rating == null}" style="color: #999;">No rating</span>
                     </td>
                     <td class="action-buttons">
-                        <a th:href="@{/dishes/dish-form/{id}(id=${dish.id})}" class="edit-button">✏️ Edit</a>
-                        <a th:href="@{/dishes/delete/{id}(id=${dish.id})}"
+                        <a sec:authorize="hasRole('ADMIN')" th:href="@{/dishes/dish-form/{id}(id=${dish.id})}" class="edit-button">✏️ Edit</a>
+                        <a sec:authorize="hasRole('ADMIN')" th:href="@{/dishes/delete/{id}(id=${dish.id})}"
                            class="delete-button"
                            onclick="return confirm('Are you sure you want to delete this dish?')">🗑️ Delete</a>
+                        <span sec:authorize="!isAuthenticated()" style="color: #999; font-style: italic;">Login to manage</span>
                     </td>
                 </tr>
                 <tr th:if="${dishes.isEmpty()}">
